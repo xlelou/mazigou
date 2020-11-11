@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>马子狗日常回复</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.3/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div>女朋友说：</div>
+        <input class="form-control" type="text" id='girl' placeholder="Default input">
+        <div>马子狗这么回：</div>
+        <input class="form-control" type="text" id='rep' readonly placeholder="Default input">
+        <button id='click' type="button" class="btn btn-primary">点点看</button>
+        <ul class="list-group" id='daan'>
+          </ul>
+          <div>默认概率最大分值为1</div>
+    </div>
+</body>
+<script>
+    //生成从minNum到maxNum的随机数
+        function randomNum(minNum,maxNum){ 
+            switch(arguments.length){ 
+                case 1: 
+                    return parseInt(Math.random()*minNum+1,10); 
+                break; 
+                case 2: 
+                    return parseInt(Math.random()*(maxNum-minNum+1)+minNum,10); 
+                break; 
+                    default: 
+                        return 0; 
+                    break; 
+            } 
+        }
+        var a = ['list-group-item list-group-item-primary','list-group-item list-group-item-secondary','list-group-item list-group-item-success','list-group-item list-group-item-danger',
+    'list-group-item list-group-item-warning','list-group-item list-group-item-info','list-group-item list-group-item-dark']
+        $('#click').click(function () {
+            var t = $('#girl').val()
+            if (t.length < 2) {
+                alert('你女朋友话这么少？')
+                return false
+            }
+            if (t.length > 15) {
+                alert('你女朋友屁话这么多？还不换一个')
+                return false
+            }
+            $.ajax({
+                url: './getD',
+                type: 'get',
+                data:{
+                    text:t,
+                },
+                dataType: 'json',
+                success: function (d) {
+                   if(d.tl){
+                       $('#rep').val(d.tl)
+                   }
+                   var html = ''
+                   for(var i = 0;i<d.dd.length;i++){
+                    var h = ''   
+                    if(d.dd[i].lb&&d.dd[i].pro){
+                            h=`表现出<b style='color:red'>${d.dd[i].lb}</b>的感情概率为${d.dd[i].pro}`
+                       }
+                        html +=` <li class="${a[randomNum(0,5)]}">${d.dd[i].type}的概率为${d.dd[i].prob}.${h}</li>`
+                   }
+                   $('#daan').html(html)
+                },
+                error: function (e) {
+                    alert('服务器败了')
+                }
+            })
+        })
+
+</script>
+
+</html>
